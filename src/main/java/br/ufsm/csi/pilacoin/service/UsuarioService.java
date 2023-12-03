@@ -6,7 +6,7 @@ import java.io.FileOutputStream;
 import java.security.*;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
-
+@Service
 public class UsuarioService {
 
     private void salvarChavePrivada(PrivateKey chavePrivada, String nomeArquivo) throws Exception {
