@@ -11,28 +11,28 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 
 @RestController
-@RequestMapping("/mineracao")
+@RequestMapping("/minerar")
 @CrossOrigin
 public class MineracaoController {
 
     private final UsuarioRepository usuarioRepository;
     private final MineracaoService mineracaoService;
-    public boolean minerando = true;
 
     public MineracaoController(UsuarioRepository usuarioRepository, MineracaoService mineracaoService) {
         this.mineracaoService = mineracaoService;
         this.usuarioRepository = usuarioRepository;
     }
 
-    @GetMapping("/iniciar")
-    public String iniciar() {
-        String retorno = "*** INICIANDO MINERAÇÃO ***";
+    @GetMapping("/pila")
+    public String minerarPilacoin() {
+        String retorno = "*** INICIANDO MINERAÇÃO DE PILACOIN ***";
 
         List<Usuario> usuarios = this.usuarioRepository.findAll();
         if (!usuarios.isEmpty()) {
             Usuario usuario = usuarios.get(0);
-            System.out.println("\n\n***** USUARIO ENCONTRADO *****\n\t--- " + usuario.getNome() + " ---\n***** INICIANDO MINERAÇÃO *****");
-            this.mineracaoService.run();
+            System.out.println("\n\n***** USUARIO ENCONTRADO *****\n\t--- " + usuario.getNome() + " ---\n***** INICIANDO MINERAÇÃO DE PILACOIN *****");
+            this.mineracaoService.pararMineracaoBloco();
+            this.mineracaoService.minerarPilacoin();
         } else {
             System.out.println("\n\n----- NENHUM USUARIO ENCONTRADO -----");
             retorno = "***** CADASTRE UM USUARIO PRIMEIRO *****";
@@ -41,20 +41,34 @@ public class MineracaoController {
         return retorno;
     }
 
-    @GetMapping("/trocar_status")
-    public boolean minerar() {
-        if(minerando) {
-            System.out.println("\n\n*** PARANDO MINERAÇÃO ***");
-            mineracaoService.pararMineracao();
+    @GetMapping("/bloco")
+    public String minerarBloco() {
+        String retorno = "*** INICIANDO MINERAÇÃO DE BLOCOS ***";
+
+        List<Usuario> usuarios = this.usuarioRepository.findAll();
+        if (!usuarios.isEmpty()) {
+            Usuario usuario = usuarios.get(0);
+            System.out.println("\n\n***** USUARIO ENCONTRADO *****\n\t--- " + usuario.getNome() + " ---\n***** INICIANDO MINERAÇÃO DE BLOCOS *****");
+            this.mineracaoService.pararMineracaoPila();
+            this.mineracaoService.iniciarMineracaoBloco();
         } else {
-            System.out.println("\n\n*** VOLTANDO MINERAÇÃO ***");
-            mineracaoService.iniciarMineracao();
+            System.out.println("\n\n----- NENHUM USUARIO ENCONTRADO -----");
+            retorno = "***** CADASTRE UM USUARIO PRIMEIRO *****";
         }
-        minerando = !minerando;
-        return minerando;
+
+        return retorno;
     }
 
+    @GetMapping("/pila/parar")
+    public String pararMineracaoPila() {
+        mineracaoService.pararMineracaoPila();
+        return "***** PARANDO MINERAÇÃO PILA *****" ;
+    }
 
-
+    @GetMapping("/bloco/parar")
+    public String pararMineracaoBloco() {
+        mineracaoService.pararMineracaoBloco();
+        return "***** PARANDO MINERAÇÃO PILA *****" ;
+    }
 
 }

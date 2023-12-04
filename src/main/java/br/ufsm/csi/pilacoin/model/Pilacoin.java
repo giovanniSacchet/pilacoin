@@ -21,9 +21,6 @@ public class Pilacoin {
     @Column(name = "nonce", unique = true)
     private String nonce;
 
-    @Column(name = "status")
-    private String status;
-
     @Column(name = "data_criacao")
     private Date dataCriacao;
 

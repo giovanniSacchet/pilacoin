@@ -13,7 +13,6 @@ public class KeyUtil {
 
     public static PrivateKey privateKey;
     public static PublicKey publicKey;
-    public static String nomeCriador = "giovanni";
 
     public static void carregarChavePrivada() throws Exception {
         byte[] chavePrivadaBytes = Files.readAllBytes(Paths.get("chave_privada.pem"));

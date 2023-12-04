@@ -9,5 +9,4 @@ import java.util.Optional;
 
 @Repository
 public interface PilacoinRepository extends JpaRepository<Pilacoin, String>  {
-    Optional<List<Pilacoin>> findAllByStatusEquals(String s);
 }
