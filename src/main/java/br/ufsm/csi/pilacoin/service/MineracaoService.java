@@ -57,28 +57,34 @@ public class MineracaoService {
                 chaveCriador(KeyUtil.publicKey.getEncoded()).
                 dataCriacao(new Date()).
                 nomeCriador("giovanni").build();
-        ObjectMapper obj = new ObjectMapper();
+
+        ObjectMapper objectMapper = new ObjectMapper();
         MessageDigest md = MessageDigest.getInstance("SHA-256");
+
         BigInteger hash;
         int tentativa = 0;
+
         while (true){
             if (this.dificuldadeService.getDificuldadeAtual() != null) {
-                tentativa++;
                 if(!minerandoPila){
                     while (!minerandoPila){}
                 }
+
+                tentativa++;
                 pila.setNonce(getNonce());
-                hash = new BigInteger(md.digest(obj.writeValueAsString(pila).getBytes(StandardCharsets.UTF_8))).abs();
+                hash = new BigInteger(md.digest(objectMapper.writeValueAsString(pila).getBytes(StandardCharsets.UTF_8))).abs();
+
                 if (hash.compareTo(this.dificuldadeService.getDificuldadeAtual()) < 0){
                     System.out.println("\n\n****** PILA MINERADO ****** \n\tTentativas: " + tentativa);
-                    tentativa = 0;
-                    rabbitTemplate.convertAndSend("pila-minerado", obj.writeValueAsString(pila));
+                    rabbitTemplate.convertAndSend("pila-minerado", objectMapper.writeValueAsString(pila));
+
                     pilacoinRepository.save(Pilacoin.builder().
                             nonce(pila.getNonce()).
                             dataCriacao(new Date()).
                             chaveCriador(KeyUtil.publicKey.getEncoded()).
                             nomeCriador("giovanni").
                             build());
+                    tentativa = 0;
                 }
             }
         }
@@ -110,10 +116,12 @@ public class MineracaoService {
 
             if (this.dificuldadeService.getDificuldadeAtual() != null) {
                 if (hash.compareTo(this.dificuldadeService.getDificuldadeAtual()) < 0){
+
                     System.out.println(hash);
                     System.out.println("dificuldade" + this.dificuldadeService.getDificuldadeAtual());
                     System.out.println(blocoJson);
                     System.out.println("Numero do bloco: "+bloco.getNumeroBloco());
+
                     rabbitTemplate.convertAndSend("bloco-minerado", blocoJson);
 
                     for (Transacao t : bloco.getTransacoes()) {
