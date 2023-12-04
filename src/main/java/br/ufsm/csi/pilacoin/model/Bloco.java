@@ -19,18 +19,18 @@ import java.util.List;
 @Table(name = "bloco")
 public class Bloco {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @JsonIgnore
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Column(name = "numero_bloco")
     private Long numeroBloco;
 
-    @Column(name = "nonce")
-    private String nonce;
-
     @Column(name = "nonce_bloco_anterior")
     private BigInteger nonceBlocoAnterior;
+
+    @Column(name = "nonce")
+    private String nonce;
 
     @Column(name = "chave_usuario_minerador")
     private byte[] chaveUsuarioMinerador;
@@ -38,6 +38,6 @@ public class Bloco {
     @Column(name = "nome_usuario_minerador")
     private String nomeUsuarioMinerador;
 
-    @OneToMany(mappedBy = "bloco", cascade = CascadeType.ALL)
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "bloco", fetch = FetchType.EAGER)//TENTAR USAR O .LAZY TBM
     private List<Transacao> transacoes;
 }

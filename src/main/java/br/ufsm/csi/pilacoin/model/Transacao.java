@@ -1,5 +1,6 @@
 package br.ufsm.csi.pilacoin.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import jakarta.persistence.*;
@@ -19,8 +20,9 @@ import java.util.Date;
 @Table(name = "transacao")
 public class Transacao {
     @Id
+    @JsonIgnore
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private Long id_transacao;
 
     @Column(name = "chave_usuario_origem")
     private String chaveUsuarioOrigem;
@@ -37,11 +39,15 @@ public class Transacao {
     @Column(name = "data_transacao")
     private Date dataTransacao;
 
+    @Column(name = "id_servidor")
+    private String id;
+
     @Column(name = "status")
     private String status;
 
-    @ManyToOne(cascade = CascadeType.PERSIST)
+    @JsonIgnore
     @JoinColumn(name = "bloco_id")
+    @ManyToOne(cascade = CascadeType.PERSIST)
     private Bloco bloco;
 
 }

@@ -19,9 +19,7 @@ import org.springframework.stereotype.Service;
 import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 import java.util.Random;
 
 @Service
@@ -94,6 +92,40 @@ public class MineracaoService {
             return;
         }
 
+        ObjectMapper objectMapper = new ObjectMapper();
+        Bloco bloco = objectMapper.readValue(blocoStr, Bloco.class);
+        bloco.setNomeUsuarioMinerador("giovanni");
+        bloco.setChaveUsuarioMinerador(KeyUtil.publicKey.getEncoded());
+        MessageDigest md = MessageDigest.getInstance("SHA-256");
+
+        BigInteger hash;
+        String blocoJson = "";
+
+        while(true){
+            bloco.setNonce(getNonce());
+            objectMapper = new ObjectMapper();
+            objectMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
+            blocoJson = objectMapper.writeValueAsString(bloco);
+            hash = new BigInteger(md.digest(blocoJson.getBytes(StandardCharsets.UTF_8))).abs();
+
+            if (this.dificuldadeService.getDificuldadeAtual() != null) {
+                if (hash.compareTo(this.dificuldadeService.getDificuldadeAtual()) < 0){
+                    System.out.println(hash);
+                    System.out.println("dificuldade" + this.dificuldadeService.getDificuldadeAtual());
+                    System.out.println(blocoJson);
+                    System.out.println("Numero do bloco: "+bloco.getNumeroBloco());
+                    rabbitTemplate.convertAndSend("bloco-minerado", blocoJson);
+
+                    for (Transacao t : bloco.getTransacoes()) {
+                        t.setBloco(bloco);
+                        transacaoRepository.save(t);
+                    }
+                    blocoRepository.save(bloco);
+
+                    return;
+                }
+            }
+        }
     }
 
     @RabbitListener(queues = "report")
@@ -111,7 +143,7 @@ public class MineracaoService {
     public void blocoMinerado(@Payload String blocoStr) {
         System.out.println("ESSE AQUI\n "+blocoStr);
     }*/
-    
+
     public void pararMineracaoPila(){
         minerandoPila = false;
     }
