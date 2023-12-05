@@ -15,18 +15,24 @@ import java.util.Date;
 @JsonPropertyOrder(alphabetic = true)
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @Entity
-@Table(name = "transacao")
-public class Transacao {
+@Table(name = "transferir_pila")
+public class TransferirPila {
     @Id
     @JsonIgnore
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id_transacao;
+    private Long id_transferir_pila;
 
     @Column(name = "chave_usuario_origem")
     private String chaveUsuarioOrigem;
 
     @Column(name = "chave_usuario_destino")
     private String chaveUsuarioDestino;
+
+    @Column(name = "nome_usuario_origem")
+    private String nomeUsuarioOrigem;
+
+    @Column(name = "nome_usuario_destino")
+    private String nomeUsuarioDestino;
 
     @Column(name = "assinatura")
     private String assinatura;
@@ -42,10 +48,5 @@ public class Transacao {
 
     @Column(name = "status")
     private String status;
-
-    @JsonIgnore
-    @JoinColumn(name = "bloco_id")
-    @ManyToOne(cascade = CascadeType.PERSIST)
-    private Bloco bloco;
 
 }

@@ -38,5 +38,5 @@ public class Bloco {
     private String nomeUsuarioMinerador;
 
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "bloco", fetch = FetchType.EAGER)//TENTAR USAR O .LAZY TBM
-    private List<Transacao> transacoes;
+    private List<TransacaoBloco> transacoes;
 }

@@ -2,13 +2,12 @@ package br.ufsm.csi.pilacoin.service;
 
 import br.ufsm.csi.pilacoin.model.Bloco;
 import br.ufsm.csi.pilacoin.model.Pilacoin;
-import br.ufsm.csi.pilacoin.model.Transacao;
+import br.ufsm.csi.pilacoin.model.TransacaoBloco;
 import br.ufsm.csi.pilacoin.repository.BlocoRepository;
 import br.ufsm.csi.pilacoin.repository.PilacoinRepository;
-import br.ufsm.csi.pilacoin.repository.TransacaoRepository;
+import br.ufsm.csi.pilacoin.repository.TransacaoBlocoRepository;
 import br.ufsm.csi.pilacoin.shared.KeyUtil;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.SneakyThrows;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
@@ -27,17 +26,17 @@ public class MineracaoService {
     private final RabbitTemplate rabbitTemplate;
     private final PilacoinRepository pilacoinRepository;
     private final BlocoRepository blocoRepository;
-    private final TransacaoRepository transacaoRepository;
+    private final TransacaoBlocoRepository transacaoBlocoRepository;
     private volatile boolean minerandoPila = true;
     private volatile boolean minerandoBloco = false;
     public MineracaoService(RabbitTemplate rabbitTemplate,
                             PilacoinRepository pilacoinRepository,
                             BlocoRepository blocoRepository,
-                            TransacaoRepository transacaoRepository) {
+                            TransacaoBlocoRepository transacaoBlocoRepository) {
         this.rabbitTemplate = rabbitTemplate;
         this.pilacoinRepository = pilacoinRepository;
         this.blocoRepository = blocoRepository;
-        this.transacaoRepository = transacaoRepository;
+        this.transacaoBlocoRepository = transacaoBlocoRepository;
     }
 
     public static String getNonce(){
@@ -119,9 +118,9 @@ public class MineracaoService {
                     System.out.println("\n\n***** BLOCO MINERADO *****\n\t"+blocoJson);
                     this.rabbitTemplate.convertAndSend("bloco-minerado", blocoJson);
 
-                    for (Transacao t : bloco.getTransacoes()) {
+                    for (TransacaoBloco t : bloco.getTransacoes()) {
                         t.setBloco(bloco);
-                        this.transacaoRepository.save(t);
+                        this.transacaoBlocoRepository.save(t);
                     }
 
                     this.blocoRepository.save(bloco);
