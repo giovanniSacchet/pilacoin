@@ -2,14 +2,13 @@ package br.ufsm.csi.pilacoin.service;
 
 import br.ufsm.csi.pilacoin.model.Bloco;
 import br.ufsm.csi.pilacoin.model.Pilacoin;
-import br.ufsm.csi.pilacoin.model.Transacao;
 import br.ufsm.csi.pilacoin.repository.BlocoRepository;
 import br.ufsm.csi.pilacoin.repository.PilacoinRepository;
 import br.ufsm.csi.pilacoin.repository.TransacaoRepository;
 import br.ufsm.csi.pilacoin.shared.KeyUtil;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.ObjectWriter;
 import lombok.SneakyThrows;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
@@ -19,8 +18,7 @@ import org.springframework.stereotype.Service;
 import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
-import java.util.Date;
-import java.util.Random;
+import java.util.*;
 
 @Service
 public class MineracaoService {
@@ -29,17 +27,14 @@ public class MineracaoService {
     private final PilacoinRepository pilacoinRepository;
     private final BlocoRepository blocoRepository;
     private final TransacaoRepository transacaoRepository;
-    private final DificuldadeService dificuldadeService;
     private volatile boolean minerandoPila = true;
     private volatile boolean minerandoBloco = false;
     public MineracaoService(RabbitTemplate rabbitTemplate,
                             PilacoinRepository pilacoinRepository,
-                            DificuldadeService dificuldadeService,
                             BlocoRepository blocoRepository,
                             TransacaoRepository transacaoRepository) {
         this.rabbitTemplate = rabbitTemplate;
         this.pilacoinRepository = pilacoinRepository;
-        this.dificuldadeService = dificuldadeService;
         this.blocoRepository = blocoRepository;
         this.transacaoRepository = transacaoRepository;
     }
@@ -62,30 +57,32 @@ public class MineracaoService {
         MessageDigest md = MessageDigest.getInstance("SHA-256");
 
         BigInteger hash;
-        int tentativa = 0;
+        int count = 0;
+        String pilaJson = "";
 
         while (true){
-            if (this.dificuldadeService.getDificuldadeAtual() != null) {
-                if(!minerandoPila){
-                    while (!minerandoPila){}
-                }
+            if (DificuldadeService.dificuldadeAtual != null && this.minerandoPila) {
 
-                tentativa++;
+                count++;
                 pila.setNonce(getNonce());
-                hash = new BigInteger(md.digest(objectMapper.writeValueAsString(pila).getBytes(StandardCharsets.UTF_8))).abs();
+                pilaJson = objectMapper.writeValueAsString(pila);
+                hash = new BigInteger(md.digest(pilaJson.getBytes(StandardCharsets.UTF_8))).abs();
 
-                if (hash.compareTo(this.dificuldadeService.getDificuldadeAtual()) < 0){
-                    System.out.println("\n\n****** PILA MINERADO ****** \n\tTentativas: " + tentativa);
-                    rabbitTemplate.convertAndSend("pila-minerado", objectMapper.writeValueAsString(pila));
+                if (hash.compareTo(DificuldadeService.dificuldadeAtual.abs()) < 0){
+                    System.out.println("\n\n****** PILA MINERADO ****** \n\tEm " + count + " Tentativas");
+                    System.out.println(pilaJson);
+                    this.rabbitTemplate.convertAndSend("pila-minerado", pilaJson);
 
-                    pilacoinRepository.save(Pilacoin.builder().
+                    this.pilacoinRepository.save(Pilacoin.builder().
                             nonce(pila.getNonce()).
                             dataCriacao(new Date()).
                             chaveCriador(KeyUtil.publicKey.getEncoded()).
                             nomeCriador("giovanni").
                             build());
-                    tentativa = 0;
+                    count = 0;
                 }
+            } else {
+                while (!this.minerandoPila) {}
             }
         }
     }
@@ -94,7 +91,7 @@ public class MineracaoService {
     @RabbitListener(queues = "descobre-bloco")
     public void minerarBloco(@Payload String blocoStr) {
         if (!this.minerandoBloco) {
-            rabbitTemplate.convertAndSend("descobre-bloco", blocoStr);
+            this.rabbitTemplate.convertAndSend("descobre-bloco", blocoStr);
             return;
         }
 
@@ -108,42 +105,30 @@ public class MineracaoService {
         String blocoJson = "";
 
         while(true){
+            bloco.setNonceBlocoAnterior(bloco.getNonce());
             bloco.setNonce(getNonce());
+
             objectMapper = new ObjectMapper();
             objectMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
             blocoJson = objectMapper.writeValueAsString(bloco);
             hash = new BigInteger(md.digest(blocoJson.getBytes(StandardCharsets.UTF_8))).abs();
 
-            if (this.dificuldadeService.getDificuldadeAtual() != null) {
-                if (hash.compareTo(this.dificuldadeService.getDificuldadeAtual()) < 0){
+            if (DificuldadeService.dificuldadeAtual != null) {
+                if (hash.compareTo(DificuldadeService.dificuldadeAtual.abs()) < 0){
+                    System.out.println("\n\n***** BLOCO MINERADO *****\n\t"+blocoJson);
+                    this.rabbitTemplate.convertAndSend("bloco-minerado", blocoJson);
 
-                    System.out.println(hash);
-                    System.out.println("dificuldade" + this.dificuldadeService.getDificuldadeAtual());
-                    System.out.println(blocoJson);
-                    System.out.println("Numero do bloco: "+bloco.getNumeroBloco());
-
-                    rabbitTemplate.convertAndSend("bloco-minerado", blocoJson);
-
-                    for (Transacao t : bloco.getTransacoes()) {
+                    /*for (Transacao t : bloco.getTransacoes()) {
                         t.setBloco(bloco);
-                        transacaoRepository.save(t);
+                        this.transacaoRepository.save(t);
                     }
-                    blocoRepository.save(bloco);
 
+                    this.blocoRepository.save(bloco);
+                    */
                     return;
                 }
             }
         }
-    }
-
-    @RabbitListener(queues = "report")
-    public void teste(@Payload String teste) {
-        System.out.println(teste);
-    }
-
-    @RabbitListener(queues = "giovanni")
-    public void mensagens(@Payload String msg){
-        System.out.println("-=+=".repeat(10)+"\n"+msg+"\n"+"-=+=".repeat(10));
     }
 
     /*@SneakyThrows

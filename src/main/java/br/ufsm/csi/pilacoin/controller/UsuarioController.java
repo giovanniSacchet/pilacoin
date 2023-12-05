@@ -29,7 +29,7 @@ public class UsuarioController {
     public String adicionarUsuario() throws Exception {
         List<Usuario> usuarios = this.usuarioRepository.findAll();
         if (!usuarios.isEmpty()) {
-            return "\n\n ***** APENAS 1 USUÁRIO PERMITIDO NO SISTEMA! *****";
+            return "***** APENAS 1 USUÁRIO PERMITIDO NO SISTEMA! *****";
         }
 
         this.usuarioService.gerarKeyPair();
@@ -37,6 +37,6 @@ public class UsuarioController {
         u.setNome("giovanni");
         this.usuarioRepository.save(u);
 
-        return "\n\n ***** USUÁRIO ADICIONADO! *****";
+        return "***** USUÁRIO ADICIONADO! *****";
     }
 }

@@ -68,7 +68,7 @@ public class MineracaoController {
     @GetMapping("/bloco/parar")
     public String pararMineracaoBloco() {
         mineracaoService.pararMineracaoBloco();
-        return "***** PARANDO MINERAÇÃO PILA *****" ;
+        return "***** PARANDO MINERAÇÃO BLOCO *****" ;
     }
 
 }

@@ -6,7 +6,6 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.math.BigInteger;
 import java.util.List;
 
 @Data
@@ -14,6 +13,8 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
+@JsonPropertyOrder(alphabetic = true)
+@JsonInclude(JsonInclude.Include.NON_NULL)
 @Table(name = "bloco")
 public class Bloco {
     @Id
@@ -25,7 +26,7 @@ public class Bloco {
     private Long numeroBloco;
 
     @Column(name = "nonce_bloco_anterior")
-    private BigInteger nonceBlocoAnterior;
+    private String nonceBlocoAnterior;
 
     @Column(name = "nonce")
     private String nonce;

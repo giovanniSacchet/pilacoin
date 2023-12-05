@@ -3,6 +3,10 @@ package br.ufsm.csi.pilacoin.model;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import lombok.*;
+
+import java.math.BigInteger;
+import java.util.Date;
+
 @Data
 @Builder
 @NoArgsConstructor
@@ -11,10 +15,10 @@ import lombok.*;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class Dificuldade {
 
-    private String dificuldade;
+    private BigInteger dificuldade;
 
-    private long inicio;
+    private Date inicio;
 
-    private long validadeFinal;
+    private Date validadeFinal;
 
 }

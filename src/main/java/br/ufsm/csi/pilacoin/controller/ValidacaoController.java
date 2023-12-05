@@ -31,6 +31,7 @@ public class ValidacaoController {
         if (!usuarios.isEmpty()) {
             Usuario usuario = usuarios.get(0);
             System.out.println("\n\n***** USUARIO ENCONTRADO *****\n\t--- " + usuario.getNome() + " ---\n***** INICIANDO VALIDAÇÃO DE PILACOIN *****");
+            this.validacaoService.pararValidacaoBloco();
             this.validacaoService.iniciarValidacaoPila();
         } else {
             System.out.println("\n\n----- NENHUM USUARIO ENCONTRADO -----");
@@ -43,5 +44,28 @@ public class ValidacaoController {
     public String pararValidacaoPila() {
         this.validacaoService.pararValidacaoPila();
         return "***** PARANDO VALIDAÇÃO PILA *****" ;
+    }
+
+    @GetMapping("/bloco")
+    public String validarBloco() {
+        String retorno = "*** INICIANDO VALIDAÇÃO DE BLOCO ***";
+
+        List<Usuario> usuarios = this.usuarioRepository.findAll();
+        if (!usuarios.isEmpty()) {
+            Usuario usuario = usuarios.get(0);
+            System.out.println("\n\n***** USUARIO ENCONTRADO *****\n\t--- " + usuario.getNome() + " ---\n***** INICIANDO VALIDAÇÃO DE BLOCO *****");
+            this.validacaoService.pararValidacaoPila();
+            this.validacaoService.iniciarValidacaoBloco();
+        } else {
+            System.out.println("\n\n----- NENHUM USUARIO ENCONTRADO -----");
+            retorno = "***** CADASTRE UM USUARIO PRIMEIRO *****";
+        }
+
+        return retorno;
+    }
+    @GetMapping("/bloco/parar")
+    public String pararValidacaoBloco() {
+        this.validacaoService.pararValidacaoBloco();
+        return "***** PARANDO VALIDAÇÃO BLOCO *****" ;
     }
 }
