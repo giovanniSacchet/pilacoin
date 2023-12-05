@@ -2,6 +2,7 @@ package br.ufsm.csi.pilacoin.service;
 
 import br.ufsm.csi.pilacoin.model.Bloco;
 import br.ufsm.csi.pilacoin.model.Pilacoin;
+import br.ufsm.csi.pilacoin.model.Transacao;
 import br.ufsm.csi.pilacoin.repository.BlocoRepository;
 import br.ufsm.csi.pilacoin.repository.PilacoinRepository;
 import br.ufsm.csi.pilacoin.repository.TransacaoRepository;
@@ -118,24 +119,17 @@ public class MineracaoService {
                     System.out.println("\n\n***** BLOCO MINERADO *****\n\t"+blocoJson);
                     this.rabbitTemplate.convertAndSend("bloco-minerado", blocoJson);
 
-                    /*for (Transacao t : bloco.getTransacoes()) {
+                    for (Transacao t : bloco.getTransacoes()) {
                         t.setBloco(bloco);
                         this.transacaoRepository.save(t);
                     }
 
                     this.blocoRepository.save(bloco);
-                    */
                     return;
                 }
             }
         }
     }
-
-    /*@SneakyThrows
-    @RabbitListener(queues = "bloco-minerado")
-    public void blocoMinerado(@Payload String blocoStr) {
-        System.out.println("ESSE AQUI\n "+blocoStr);
-    }*/
 
     public void pararMineracaoPila(){
         minerandoPila = false;

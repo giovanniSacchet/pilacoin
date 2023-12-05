@@ -17,11 +17,13 @@ import java.util.List;
 public class ValidacaoController {
 
     private final ValidacaoService validacaoService;
+    private final MineracaoService mineracaoService;
     private final UsuarioRepository usuarioRepository;
 
-    public ValidacaoController(ValidacaoService validacaoService, UsuarioRepository usuarioRepository) {
+    public ValidacaoController(ValidacaoService validacaoService, UsuarioRepository usuarioRepository, MineracaoService mineracaoService) {
         this.validacaoService = validacaoService;
         this.usuarioRepository = usuarioRepository;
+        this.mineracaoService = mineracaoService;
     }
     @GetMapping("/pila")
     public String validarPilacoin() {
@@ -31,6 +33,8 @@ public class ValidacaoController {
         if (!usuarios.isEmpty()) {
             Usuario usuario = usuarios.get(0);
             System.out.println("\n\n***** USUARIO ENCONTRADO *****\n\t--- " + usuario.getNome() + " ---\n***** INICIANDO VALIDAÇÃO DE PILACOIN *****");
+            this.mineracaoService.pararMineracaoPila();
+            this.mineracaoService.pararMineracaoBloco();
             this.validacaoService.pararValidacaoBloco();
             this.validacaoService.iniciarValidacaoPila();
         } else {
@@ -54,6 +58,8 @@ public class ValidacaoController {
         if (!usuarios.isEmpty()) {
             Usuario usuario = usuarios.get(0);
             System.out.println("\n\n***** USUARIO ENCONTRADO *****\n\t--- " + usuario.getNome() + " ---\n***** INICIANDO VALIDAÇÃO DE BLOCO *****");
+            this.mineracaoService.pararMineracaoPila();
+            this.mineracaoService.pararMineracaoBloco();
             this.validacaoService.pararValidacaoPila();
             this.validacaoService.iniciarValidacaoBloco();
         } else {
