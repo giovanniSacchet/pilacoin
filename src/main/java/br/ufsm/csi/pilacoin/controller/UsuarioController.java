@@ -25,18 +25,11 @@ public class UsuarioController {
     }
 
 
-    @GetMapping("/add")
-    public String adicionarUsuario() throws Exception {
-        List<Usuario> usuarios = this.usuarioRepository.findAll();
-        if (!usuarios.isEmpty()) {
-            return "***** APENAS 1 USUÁRIO PERMITIDO NO SISTEMA! *****";
-        }
+    @GetMapping("/keypair")
+    public String gerarKeypair() throws Exception {
 
-        this.usuarioService.gerarKeyPair();
-        Usuario u = new Usuario();
-        u.setNome("giovanni");
-        this.usuarioRepository.save(u);
+        //this.usuarioService.gerarKeyPair();
 
-        return "***** USUÁRIO ADICIONADO! *****";
+        return "***** KEY PAIR GERADA! *****";
     }
 }

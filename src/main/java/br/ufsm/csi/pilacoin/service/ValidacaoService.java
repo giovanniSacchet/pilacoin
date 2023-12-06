@@ -1,10 +1,8 @@
 package br.ufsm.csi.pilacoin.service;
 
-import br.ufsm.csi.pilacoin.model.Bloco;
-import br.ufsm.csi.pilacoin.model.BlocoValidado;
-import br.ufsm.csi.pilacoin.model.PilaValidado;
-import br.ufsm.csi.pilacoin.model.Pilacoin;
+import br.ufsm.csi.pilacoin.model.*;
 import br.ufsm.csi.pilacoin.shared.KeyUtil;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.SneakyThrows;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
@@ -34,15 +32,10 @@ public class ValidacaoService {
     @SneakyThrows
     @RabbitListener(queues = "pila-minerado")
     public void validarPila(@Payload String pilaStr) {
-        if (!validandoPila) {
-            rabbitTemplate.convertAndSend("pila-minerado", pilaStr);
-            return;
-        }
-
         ObjectMapper objectMapper = new ObjectMapper();
         Pilacoin pilacoin = objectMapper.readValue(pilaStr, Pilacoin.class);
 
-        if(pilacoin.getNomeCriador().equals("giovanni")){
+        if(!validandoPila || pilacoin.getNomeCriador().equals("gxs")) {
             rabbitTemplate.convertAndSend("pila-minerado", pilaStr);
         } else {
 
@@ -51,14 +44,14 @@ public class ValidacaoService {
             BigInteger hash = new BigInteger(md.digest(pilaStr.getBytes(StandardCharsets.UTF_8))).abs();
 
             if (DificuldadeService.dificuldadeAtual != null) {
-                if(hash.compareTo(DificuldadeService.dificuldadeAtual.abs()) < 0){
+                if(hash.compareTo(DificuldadeService.dificuldadeAtual.abs()) < 0) {
                     Cipher cipher = Cipher.getInstance("RSA");
                     cipher.init(Cipher.ENCRYPT_MODE, KeyUtil.privateKey);
                     byte[] assinatura = md.digest(pilaStr.getBytes(StandardCharsets.UTF_8));
                     PilaValidado pilaValidado = PilaValidado.builder().
                             pilaCoinJson(pilacoin).
                             assinaturaPilaCoin(cipher.doFinal(assinatura)).
-                            nomeValidador("giovanni").
+                            nomeValidador("gxs").
                             chavePublicaValidador(KeyUtil.publicKey.getEncoded()).build();
                     rabbitTemplate.convertAndSend("pila-validado", objectMapper.writeValueAsString(pilaValidado));
                     System.out.println("***** PILA VALIDADO! *****");
@@ -73,11 +66,7 @@ public class ValidacaoService {
     @SneakyThrows
     @RabbitListener(queues = "bloco-minerado")
     public void validarBloco(@Payload String blocoStr) {
-        if (!validandoBloco) {
-            rabbitTemplate.convertAndSend("bloco-minerado", blocoStr);
-            return;
-        }
-
+        System.out.println(blocoStr);
         Bloco bloco;
         ObjectMapper objectMapper = new ObjectMapper();
         try {
@@ -86,6 +75,11 @@ public class ValidacaoService {
             e.printStackTrace();
             rabbitTemplate.convertAndSend("bloco-minerado", blocoStr);
             System.out.println("\n\n***** BLOCO INVALIDO! *****");
+            return;
+        }
+
+        if (!validandoBloco || bloco.getNomeUsuarioMinerador().equals("gxs")) {
+            rabbitTemplate.convertAndSend("bloco-minerado", blocoStr);
             return;
         }
 
@@ -102,7 +96,7 @@ public class ValidacaoService {
                         assinaturaBloco(cipher.doFinal(assinatura)).
                         bloco(bloco).
                         chavePublicaValidador(KeyUtil.publicKey.getEncoded()).
-                        nomeValidador("giovanni").build();
+                        nomeValidador("gxs").build();
                 rabbitTemplate.convertAndSend("bloco-validado", objectMapper.writeValueAsString(blocoValidado));
 
             } else {
@@ -123,8 +117,5 @@ public class ValidacaoService {
     public void pararValidacaoBloco() {
         validandoBloco = false;
     }
-
-
-
 
 }

@@ -14,6 +14,9 @@ public class Usuario {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "nome")
+    @Column(name = "nome", unique = true)
     private String nome;
+
+    @Column(name = "chave_publica")
+    private byte[] chavePublica;
 }

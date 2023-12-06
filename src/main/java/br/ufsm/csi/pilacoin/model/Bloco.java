@@ -28,7 +28,7 @@ public class Bloco {
     @Column(name = "nonce_bloco_anterior")
     private String nonceBlocoAnterior;
 
-    @Column(name = "nonce")
+    @Column(name = "nonce", unique = true)
     private String nonce;
 
     @Column(name = "chave_usuario_minerador")
@@ -38,5 +38,5 @@ public class Bloco {
     private String nomeUsuarioMinerador;
 
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "bloco", fetch = FetchType.EAGER)//TENTAR USAR O .LAZY TBM
-    private List<TransacaoBloco> transacoes;
+    private List<TransferirPila> transacoes;
 }

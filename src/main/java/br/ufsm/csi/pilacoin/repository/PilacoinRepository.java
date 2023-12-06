@@ -9,4 +9,7 @@ import java.util.Optional;
 
 @Repository
 public interface PilacoinRepository extends JpaRepository<Pilacoin, String>  {
+    Optional<Pilacoin> findByNonce(String nonce);
+    List<Pilacoin> findAllByStatus(String status);
+
 }

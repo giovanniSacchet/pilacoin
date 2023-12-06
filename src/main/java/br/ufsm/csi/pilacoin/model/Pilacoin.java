@@ -7,6 +7,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.util.Date;
+import java.util.List;
 
 @Data
 @Builder
@@ -34,5 +35,10 @@ public class Pilacoin {
     @Column(name = "nome_criador")
     private String nomeCriador;
 
+    @Column(name = "status")
+    private String status;
+
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "pilacoin", fetch = FetchType.EAGER)
+    private List<TransferirPila> transacoes;
 
 }

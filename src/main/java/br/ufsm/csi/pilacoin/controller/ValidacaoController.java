@@ -1,7 +1,5 @@
 package br.ufsm.csi.pilacoin.controller;
 
-import br.ufsm.csi.pilacoin.model.Usuario;
-import br.ufsm.csi.pilacoin.repository.UsuarioRepository;
 import br.ufsm.csi.pilacoin.service.MineracaoService;
 import br.ufsm.csi.pilacoin.service.ValidacaoService;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -18,31 +16,18 @@ public class ValidacaoController {
 
     private final ValidacaoService validacaoService;
     private final MineracaoService mineracaoService;
-    private final UsuarioRepository usuarioRepository;
 
-    public ValidacaoController(ValidacaoService validacaoService, UsuarioRepository usuarioRepository, MineracaoService mineracaoService) {
+    public ValidacaoController(ValidacaoService validacaoService, MineracaoService mineracaoService) {
         this.validacaoService = validacaoService;
-        this.usuarioRepository = usuarioRepository;
         this.mineracaoService = mineracaoService;
     }
     @GetMapping("/pila")
     public String validarPilacoin() {
-        String retorno = "*** INICIANDO VALIDAÇÃO DE PILACOIN ***";
-
-        List<Usuario> usuarios = this.usuarioRepository.findAll();
-        if (!usuarios.isEmpty()) {
-            Usuario usuario = usuarios.get(0);
-            System.out.println("\n\n***** USUARIO ENCONTRADO *****\n\t--- " + usuario.getNome() + " ---\n***** INICIANDO VALIDAÇÃO DE PILACOIN *****");
-            this.mineracaoService.pararMineracaoPila();
-            this.mineracaoService.pararMineracaoBloco();
-            this.validacaoService.pararValidacaoBloco();
-            this.validacaoService.iniciarValidacaoPila();
-        } else {
-            System.out.println("\n\n----- NENHUM USUARIO ENCONTRADO -----");
-            retorno = "***** CADASTRE UM USUARIO PRIMEIRO *****";
-        }
-
-        return retorno;
+        this.mineracaoService.pararMineracaoPila();
+        this.mineracaoService.pararMineracaoBloco();
+        this.validacaoService.pararValidacaoBloco();
+        this.validacaoService.iniciarValidacaoPila();
+        return "*** INICIANDO VALIDAÇÃO DE PILACOIN ***";
     }
     @GetMapping("/pila/parar")
     public String pararValidacaoPila() {
@@ -52,22 +37,11 @@ public class ValidacaoController {
 
     @GetMapping("/bloco")
     public String validarBloco() {
-        String retorno = "*** INICIANDO VALIDAÇÃO DE BLOCO ***";
-
-        List<Usuario> usuarios = this.usuarioRepository.findAll();
-        if (!usuarios.isEmpty()) {
-            Usuario usuario = usuarios.get(0);
-            System.out.println("\n\n***** USUARIO ENCONTRADO *****\n\t--- " + usuario.getNome() + " ---\n***** INICIANDO VALIDAÇÃO DE BLOCO *****");
-            this.mineracaoService.pararMineracaoPila();
-            this.mineracaoService.pararMineracaoBloco();
-            this.validacaoService.pararValidacaoPila();
-            this.validacaoService.iniciarValidacaoBloco();
-        } else {
-            System.out.println("\n\n----- NENHUM USUARIO ENCONTRADO -----");
-            retorno = "***** CADASTRE UM USUARIO PRIMEIRO *****";
-        }
-
-        return retorno;
+        this.mineracaoService.pararMineracaoPila();
+        this.mineracaoService.pararMineracaoBloco();
+        this.validacaoService.pararValidacaoPila();
+        this.validacaoService.iniciarValidacaoBloco();
+        return "*** INICIANDO VALIDAÇÃO DE BLOCO ***";
     }
     @GetMapping("/bloco/parar")
     public String pararValidacaoBloco() {

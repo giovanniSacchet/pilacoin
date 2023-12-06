@@ -7,6 +7,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.util.Date;
+import java.util.List;
 
 @Data
 @Builder
@@ -23,10 +24,10 @@ public class TransferirPila {
     private Long id_transferir_pila;
 
     @Column(name = "chave_usuario_origem")
-    private String chaveUsuarioOrigem;
+    private byte[] chaveUsuarioOrigem;
 
     @Column(name = "chave_usuario_destino")
-    private String chaveUsuarioDestino;
+    private byte[] chaveUsuarioDestino;
 
     @Column(name = "nome_usuario_origem")
     private String nomeUsuarioOrigem;
@@ -35,7 +36,7 @@ public class TransferirPila {
     private String nomeUsuarioDestino;
 
     @Column(name = "assinatura")
-    private String assinatura;
+    private byte[] assinatura;
 
     @Column(name = "nonce_pila")
     private String noncePila;
@@ -48,5 +49,15 @@ public class TransferirPila {
 
     @Column(name = "status")
     private String status;
+
+    @JsonIgnore
+    @JoinColumn(name = "id_pilacoin")
+    @ManyToOne(cascade = CascadeType.PERSIST)
+    private Pilacoin pilacoin;
+
+    @JsonIgnore
+    @JoinColumn(name = "id_bloco")
+    @ManyToOne(cascade = CascadeType.PERSIST)
+    private Bloco bloco;
 
 }

@@ -1,7 +1,5 @@
 package br.ufsm.csi.pilacoin.controller;
 
-import br.ufsm.csi.pilacoin.model.Usuario;
-import br.ufsm.csi.pilacoin.repository.UsuarioRepository;
 import br.ufsm.csi.pilacoin.service.MineracaoService;
 import br.ufsm.csi.pilacoin.service.ValidacaoService;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -16,13 +14,11 @@ import java.util.List;
 @CrossOrigin
 public class MineracaoController {
 
-    private final UsuarioRepository usuarioRepository;
     private final MineracaoService mineracaoService;
     private final ValidacaoService validacaoService;
 
-    public MineracaoController(UsuarioRepository usuarioRepository, MineracaoService mineracaoService, ValidacaoService validacaoService) {
+    public MineracaoController(MineracaoService mineracaoService, ValidacaoService validacaoService) {
         this.mineracaoService = mineracaoService;
-        this.usuarioRepository = usuarioRepository;
         this.validacaoService = validacaoService;
     }
 
@@ -30,18 +26,10 @@ public class MineracaoController {
     public String minerarPilacoin() {
         String retorno = "*** INICIANDO MINERAÇÃO DE PILACOIN ***";
 
-        List<Usuario> usuarios = this.usuarioRepository.findAll();
-        if (!usuarios.isEmpty()) {
-            Usuario usuario = usuarios.get(0);
-            System.out.println("\n\n***** USUARIO ENCONTRADO *****\n\t--- " + usuario.getNome() + " ---\n***** INICIANDO MINERAÇÃO DE PILACOIN *****");
-            this.validacaoService.pararValidacaoPila();
-            this.validacaoService.pararValidacaoBloco();
-            this.mineracaoService.pararMineracaoBloco();
-            this.mineracaoService.minerarPilacoin();
-        } else {
-            System.out.println("\n\n----- NENHUM USUARIO ENCONTRADO -----");
-            retorno = "***** CADASTRE UM USUARIO PRIMEIRO *****";
-        }
+        this.validacaoService.pararValidacaoPila();
+        this.validacaoService.pararValidacaoBloco();
+        this.mineracaoService.pararMineracaoBloco();
+        this.mineracaoService.minerarPilacoin();
 
         return retorno;
     }
@@ -50,18 +38,10 @@ public class MineracaoController {
     public String minerarBloco() {
         String retorno = "*** INICIANDO MINERAÇÃO DE BLOCOS ***";
 
-        List<Usuario> usuarios = this.usuarioRepository.findAll();
-        if (!usuarios.isEmpty()) {
-            Usuario usuario = usuarios.get(0);
-            System.out.println("\n\n***** USUARIO ENCONTRADO *****\n\t--- " + usuario.getNome() + " ---\n***** INICIANDO MINERAÇÃO DE BLOCOS *****");
-            this.validacaoService.pararValidacaoPila();
-            this.validacaoService.pararValidacaoBloco();
-            this.mineracaoService.pararMineracaoPila();
-            this.mineracaoService.iniciarMineracaoBloco();
-        } else {
-            System.out.println("\n\n----- NENHUM USUARIO ENCONTRADO -----");
-            retorno = "***** CADASTRE UM USUARIO PRIMEIRO *****";
-        }
+        this.validacaoService.pararValidacaoPila();
+        this.validacaoService.pararValidacaoBloco();
+        this.mineracaoService.pararMineracaoPila();
+        this.mineracaoService.iniciarMineracaoBloco();
 
         return retorno;
     }

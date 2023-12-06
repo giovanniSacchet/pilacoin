@@ -9,6 +9,8 @@ import java.security.spec.X509EncodedKeySpec;
 @Service
 public class UsuarioService {
 
+    //  ******* METODOS CHAMADOS APENAS 1 VEZ **************
+
     private void salvarChavePrivada(PrivateKey chavePrivada, String nomeArquivo) throws Exception {
         PKCS8EncodedKeySpec pkcs8EncodedKeySpec = new PKCS8EncodedKeySpec(chavePrivada.getEncoded());
         try (FileOutputStream fos = new FileOutputStream(nomeArquivo)) {
