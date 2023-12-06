@@ -67,6 +67,7 @@ public class ValidacaoService {
     @RabbitListener(queues = "bloco-minerado")
     public void validarBloco(@Payload String blocoStr) {
         System.out.println(blocoStr);
+        System.out.println("\n**** VALIDANDO BLOCO ****\n\n");
         Bloco bloco;
         ObjectMapper objectMapper = new ObjectMapper();
         try {
@@ -98,7 +99,7 @@ public class ValidacaoService {
                         chavePublicaValidador(KeyUtil.publicKey.getEncoded()).
                         nomeValidador("gxs").build();
                 rabbitTemplate.convertAndSend("bloco-validado", objectMapper.writeValueAsString(blocoValidado));
-
+                System.out.println("\n\n**** VALIDOU DOS TOP *****\n\n\n");
             } else {
                 rabbitTemplate.convertAndSend("bloco-minerado", blocoStr);
             }

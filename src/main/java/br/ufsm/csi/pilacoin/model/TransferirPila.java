@@ -19,9 +19,8 @@ import java.util.List;
 @Table(name = "transferir_pila")
 public class TransferirPila {
     @Id
-    @JsonIgnore
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id_transferir_pila;
+    private Long id;
 
     @Column(name = "chave_usuario_origem")
     private byte[] chaveUsuarioOrigem;
@@ -43,9 +42,6 @@ public class TransferirPila {
 
     @Column(name = "data_transacao")
     private Date dataTransacao;
-
-    @Column(name = "id_servidor")
-    private String id;
 
     @Column(name = "status")
     private String status;
