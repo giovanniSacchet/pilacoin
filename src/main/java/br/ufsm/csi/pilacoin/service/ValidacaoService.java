@@ -2,7 +2,6 @@ package br.ufsm.csi.pilacoin.service;
 
 import br.ufsm.csi.pilacoin.model.*;
 import br.ufsm.csi.pilacoin.shared.KeyUtil;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.SneakyThrows;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
@@ -66,16 +65,14 @@ public class ValidacaoService {
     @SneakyThrows
     @RabbitListener(queues = "bloco-minerado")
     public void validarBloco(@Payload String blocoStr) {
-        System.out.println(blocoStr);
-        System.out.println("\n**** VALIDANDO BLOCO ****\n\n");
         Bloco bloco;
         ObjectMapper objectMapper = new ObjectMapper();
         try {
             bloco = objectMapper.readValue(blocoStr, Bloco.class);
         } catch (Exception e) {
-            e.printStackTrace();
+            //e.printStackTrace();
             rabbitTemplate.convertAndSend("bloco-minerado", blocoStr);
-            System.out.println("\n\n***** BLOCO INVALIDO! *****");
+            //System.out.println("\n\n***** BLOCO INVALIDO! *****");
             return;
         }
 
@@ -84,10 +81,11 @@ public class ValidacaoService {
             return;
         }
 
+        System.out.println("\n**** VALIDANDO BLOCO ****\n\n");
         MessageDigest md = MessageDigest.getInstance("SHA-256");
         BigInteger hash = new BigInteger(md.digest(blocoStr.getBytes(StandardCharsets.UTF_8))).abs();
 
-        if (DificuldadeService.dificuldadeAtual != null && bloco != null) {
+        if (DificuldadeService.dificuldadeAtual != null) {
             if (hash.compareTo(DificuldadeService.dificuldadeAtual.abs()) < 0) {
 
                 Cipher cipher = Cipher.getInstance("RSA");

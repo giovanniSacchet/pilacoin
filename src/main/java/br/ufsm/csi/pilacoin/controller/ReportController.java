@@ -36,7 +36,7 @@ public class ReportController {
     public void salvarPilasBanco() throws JsonProcessingException {
         ObjectMapper objectMapper = new ObjectMapper();
         rabbitTemplate.convertAndSend("query", objectMapper.writeValueAsString(EnviarQueryServidor.builder().
-                tipoQuery("PILA").idQuery(37).nomeUsuario("gxs").usuarioMinerador("gxs").build()));
+                tipoQuery("PILA").idQuery(37).nomeUsuario("gxs").build()));
     }
 
     @GetMapping("/query/bloco")

@@ -30,7 +30,7 @@ public class DificuldadeService {
 
         if (!dif.getDificuldade().equals(dificuldadeAtual)) {
             dificuldadeAtual = dif.getDificuldade();
-            System.out.println("\n\n******* ATUALIZOU DIFICULDADE ****** \n\n " + dif.getDificuldade());
+            //System.out.println("\n\n******* ATUALIZOU DIFICULDADE ****** \n\n " + dif.getDificuldade());
         }
 
     }

@@ -48,7 +48,7 @@ public class MineracaoService {
         String pilaJson = "";
 
         while (this.minerandoPila) {
-            if (DificuldadeService.dificuldadeAtual != null && this.minerandoPila) {
+            if (DificuldadeService.dificuldadeAtual != null) {
                 pila.setNonce(getNonce());
                 pilaJson = objectMapper.writeValueAsString(pila);
                 hash = new BigInteger(md.digest(pilaJson.getBytes(StandardCharsets.UTF_8))).abs();

@@ -19,6 +19,7 @@ public class KeyUtil {
         PKCS8EncodedKeySpec chavePrivadaSpec = new PKCS8EncodedKeySpec(chavePrivadaBytes);
         KeyFactory keyFactory = KeyFactory.getInstance("RSA");
         privateKey = keyFactory.generatePrivate(chavePrivadaSpec);
+        System.out.println("\n\n***** CHAVE PRIVADA *****\n\t" + privateKey);
     }
 
     public static void carregarChavePublica() throws Exception {
@@ -26,6 +27,7 @@ public class KeyUtil {
         X509EncodedKeySpec chavePublicaSpec = new X509EncodedKeySpec(chavePublicaBytes);
         KeyFactory keyFactory = KeyFactory.getInstance("RSA");
         publicKey = keyFactory.generatePublic(chavePublicaSpec);
+        System.out.println("\n\n***** CHAVE PUBLICA *****\n\t" + publicKey);
     }
 
 }

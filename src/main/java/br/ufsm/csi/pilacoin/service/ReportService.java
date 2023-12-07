@@ -47,7 +47,11 @@ public class ReportService {
                     }
                 }
             }
-            System.out.println("\n\n\n***** STATUS TRABALHO *****\n\tMinerou Pila: " + this.meuReport.isMinerouPila() + "\n\tValidou Pila: " + this.meuReport.isValidouPila() + "\n\tMinerou Bloco: " + this.meuReport.isMinerouBloco() + "\n\tValidou Bloco: " + this.meuReport.isValidouBloco() + "\n\tTransferiu Pila: " + this.meuReport.isTransferiuPila() + "\n\n\n");
+            if (this.meuReport.isMinerouPila() && this.meuReport.isValidouPila() && this.meuReport.isMinerouBloco() && this.meuReport.isValidouBloco() && this.meuReport.isTransferiuPila()) {
+                System.out.println("\n\n\n\t\t ************* DALE TRICOLOR *************\n\n\n");
+            } else {
+                System.out.println("\n\n\n***** STATUS TRABALHO *****\n\tMinerou Pila: " + this.meuReport.isMinerouPila() + "\n\tValidou Pila: " + this.meuReport.isValidouPila() + "\n\tMinerou Bloco: " + this.meuReport.isMinerouBloco() + "\n\tValidou Bloco: " + this.meuReport.isValidouBloco() + "\n\tTransferiu Pila: " + this.meuReport.isTransferiuPila() + "\n\n\n");
+            }
         }
     }
 
@@ -61,9 +65,7 @@ public class ReportService {
 
     private void salvarPilaBanco(Pilacoin pilacoin) {
         if (pilacoin.getTransacoes() != null && !pilacoin.getTransacoes().isEmpty()) {
-            for (TransferirPila t : pilacoin.getTransacoes()) {
-                this.transferirPilaRepository.saveAll(pilacoin.getTransacoes());
-            }
+            this.transferirPilaRepository.saveAll(pilacoin.getTransacoes());
         }
         this.pilacoinRepository.save(Pilacoin.builder().
                 nonce(pilacoin.getNonce()).
@@ -96,16 +98,42 @@ public class ReportService {
                 chavePublica(usuario.getChavePublica()).build());
     }
 
+    private void updatePila(Pilacoin pilacoinBanco, Pilacoin pilacoinAtualizado) {
+        boolean salvar = false;
+        if (pilacoinBanco.getTransacoes().size() != pilacoinAtualizado.getTransacoes().size()) {
+            pilacoinBanco.setTransacoes(pilacoinAtualizado.getTransacoes());
+            this.transferirPilaRepository.saveAll(pilacoinBanco.getTransacoes());
+            salvar = true;
+        }
+        if (!pilacoinBanco.getStatus().equals(pilacoinAtualizado.getStatus())) {
+            pilacoinBanco.setStatus(pilacoinAtualizado.getStatus());
+            salvar = true;
+        }
+
+        if (salvar) {
+            this.pilacoinRepository.save(pilacoinBanco);
+        }
+    }
+
     private void salvarPilaQuery(List<Pilacoin> pilaList) {
         List<Pilacoin> pilasArmazenados = this.pilacoinRepository.findAll();
         for (Pilacoin pila : pilaList) {
-            if (!pilasArmazenados.isEmpty()) {// Se ja tiver algum pila no banco
-                Optional<Pilacoin> pilaBanco = this.pilacoinRepository.findByNonce(pila.getNonce()); // Verifica se esse pila ja esta no banco
-                if (!pilaBanco.isPresent()) {
+            if (pila.getNomeCriador().equals("gxs")) {
+                //verificar se foi transferido para mim
+                if (!pilasArmazenados.isEmpty()) { // Se ja tiver algum pila no banco
+                    Optional<Pilacoin> pilaBanco = this.pilacoinRepository.findByNonce(pila.getNonce()); // Verifica se esse pila ja esta no banco
+                    if (pilaBanco.isEmpty()) { // se ele n estiver no banco
+                        this.salvarPilaBanco(pila);
+                    } else { // se ele existir no banco trocar status e transacoes e armazenar novamente
+                        if (pilaBanco.get() != null) {
+                            this.updatePila(pilaBanco.get(), pila);
+                        }
+                    }
+                } else {
                     this.salvarPilaBanco(pila);
                 }
-            } else {
-                this.salvarPilaBanco(pila);
+
+
             }
         }
     }
@@ -146,7 +174,6 @@ public class ReportService {
     @SneakyThrows
     @RabbitListener(queues = "gxs-query")
     public void receberQueryPessoal(@Payload String query) {
-        System.out.println(query);
         ReceberQueryServidor receberQueryServidor = new ReceberQueryServidor();
         try {
             ObjectMapper objectMapper = new ObjectMapper();
