@@ -100,10 +100,18 @@ public class ReportService {
 
     private void updatePila(Pilacoin pilacoinBanco, Pilacoin pilacoinAtualizado) {
         boolean salvar = false;
-        if (pilacoinBanco.getTransacoes().size() != pilacoinAtualizado.getTransacoes().size()) {
-            pilacoinBanco.setTransacoes(pilacoinAtualizado.getTransacoes());
-            this.transferirPilaRepository.saveAll(pilacoinBanco.getTransacoes());
-            salvar = true;
+        if (pilacoinBanco.getTransacoes().size() < pilacoinAtualizado.getTransacoes().size()) {
+            List<TransferirPila> pilacoinBancoTransacoes = pilacoinBanco.getTransacoes();
+            List<TransferirPila> pilacoinAtualizadoTransacoes = pilacoinAtualizado.getTransacoes();
+
+            List<TransferirPila> novasTransacoes = new ArrayList<>(pilacoinAtualizadoTransacoes);
+            novasTransacoes.removeAll(pilacoinBancoTransacoes);
+
+            if (!novasTransacoes.isEmpty()) {
+                this.transferirPilaRepository.saveAll(novasTransacoes);
+                pilacoinBanco.setTransacoes(pilacoinAtualizado.getTransacoes());
+                salvar = true;
+            }
         }
         if (!pilacoinBanco.getStatus().equals(pilacoinAtualizado.getStatus())) {
             pilacoinBanco.setStatus(pilacoinAtualizado.getStatus());
@@ -125,11 +133,15 @@ public class ReportService {
                     if (pilaBanco.isEmpty()) { // se ele n estiver no banco
                         this.salvarPilaBanco(pila);
                     } else { // se ele existir no banco trocar status e transacoes e armazenar novamente
+                        List<TransferirPila> listTrasacao = this.transferirPilaRepository.findAllByNoncePila(pilaBanco.get().getNonce());
+                        if (!listTrasacao.isEmpty()) { // Coloca as transacoes no pila do banco
+                            pilaBanco.get().setTransacoes(listTrasacao);
+                        }
                         if (pilaBanco.get() != null) {
                             this.updatePila(pilaBanco.get(), pila);
                         }
                     }
-                } else {
+                } else { // Cadastra todos pilas no meu nome no banco
                     this.salvarPilaBanco(pila);
                 }
 

@@ -42,9 +42,10 @@ public class TransferirPilaService {
     public boolean transferirPila() throws JsonProcessingException, NoSuchPaddingException, NoSuchAlgorithmException, InvalidKeyException, IllegalBlockSizeException, BadPaddingException {
         List<Pilacoin> pilasValidados = pilacoinRepository.findAllByStatus("VALIDO");
         List<Pilacoin> pilasDisponiveis = new ArrayList<>();
+        List<TransferirPila> transacoesPila;
 
-        for (Pilacoin pila : pilasValidados) { // Coloca os pilas validos e que n tenham sido transferidos
-            List<TransferirPila> transacoesPila = this.transferirPilaRepository.findAllByNoncePila(pila.getNonce());
+        for (Pilacoin pila : pilasValidados) {
+            transacoesPila = this.transferirPilaRepository.findAllByNoncePila(pila.getNonce());
             if (!transacoesPila.isEmpty()) {
                 pila.setTransacoes(transacoesPila);
             }

@@ -44,6 +44,18 @@ public class MineracaoController {
         return retorno;
     }
 
+    @GetMapping("/tudo")
+    public String minerarTudo() {
+        String retorno = "*** INICIANDO MINERAÇÃO DE PILAS E BLOCOS ***";
+
+        this.validacaoService.pararValidacaoPila();
+        this.validacaoService.pararValidacaoBloco();
+        this.mineracaoService.iniciarMineracaoBloco();
+        this.mineracaoService.minerarPilacoin();
+
+        return retorno;
+    }
+
     @GetMapping("/pila/parar")
     public String pararMineracaoPila() {
         mineracaoService.pararMineracaoPila();
