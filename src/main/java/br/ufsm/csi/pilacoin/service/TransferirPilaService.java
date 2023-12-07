@@ -79,7 +79,7 @@ public class TransferirPilaService {
 
             transferencia.setAssinatura(cipher.doFinal(assinatura));
 
-            System.out.println(objectMapper.writeValueAsString(transferencia));
+            //System.out.println(objectMapper.writeValueAsString(transferencia));
             rabbitTemplate.convertAndSend("transferir-pila", objectMapper.writeValueAsString(transferencia));
 
             this.transferirPilaRepository.save(transferencia);

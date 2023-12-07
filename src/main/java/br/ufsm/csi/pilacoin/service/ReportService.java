@@ -48,10 +48,9 @@ public class ReportService {
                 }
             }
             if (this.meuReport.isMinerouPila() && this.meuReport.isValidouPila() && this.meuReport.isMinerouBloco() && this.meuReport.isValidouBloco() && this.meuReport.isTransferiuPila()) {
-                System.out.println("\n\n\n\t\t ************* DALE TRICOLOR *************\n\n\n");
-            } else {
-                System.out.println("\n\n\n***** STATUS TRABALHO *****\n\tMinerou Pila: " + this.meuReport.isMinerouPila() + "\n\tValidou Pila: " + this.meuReport.isValidouPila() + "\n\tMinerou Bloco: " + this.meuReport.isMinerouBloco() + "\n\tValidou Bloco: " + this.meuReport.isValidouBloco() + "\n\tTransferiu Pila: " + this.meuReport.isTransferiuPila() + "\n\n\n");
+                System.out.println("\n\n\n\t\t ************* DALE TRICOLOR *************\n");
             }
+            System.out.println("\n\n\n***** STATUS TRABALHO *****\n\tMinerou Pila: " + this.meuReport.isMinerouPila() + "\n\tValidou Pila: " + this.meuReport.isValidouPila() + "\n\tMinerou Bloco: " + this.meuReport.isMinerouBloco() + "\n\tValidou Bloco: " + this.meuReport.isValidouBloco() + "\n\tTransferiu Pila: " + this.meuReport.isTransferiuPila() + "\n\n\n");
         }
     }
 
@@ -179,8 +178,8 @@ public class ReportService {
     }
 
     @RabbitListener(queues = "gxs")
-    public void mensagens(@Payload String msg){
-        System.out.println("-=+=".repeat(10)+"\n"+msg+"\n"+"-=+=".repeat(10));
+    public void ouvirMensagensServidor(@Payload String msg){
+        System.out.println("\n\n*****************************************************\n\t" + msg + "\n*****************************************************\n\n");
     }
 
     @SneakyThrows
