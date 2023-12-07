@@ -14,11 +14,7 @@ import java.util.Date;
 @JsonPropertyOrder(alphabetic = true)
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class Dificuldade {
-
     private BigInteger dificuldade;
-
     private Date inicio;
-
     private Date validadeFinal;
-
 }
