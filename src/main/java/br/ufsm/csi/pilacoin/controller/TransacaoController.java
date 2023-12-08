@@ -1,11 +1,9 @@
 package br.ufsm.csi.pilacoin.controller;
 
+import br.ufsm.csi.pilacoin.model.TransacaoUsuario;
 import br.ufsm.csi.pilacoin.service.TransferirPilaService;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.crypto.BadPaddingException;
 import javax.crypto.IllegalBlockSizeException;
@@ -24,8 +22,9 @@ public class TransacaoController {
     }
 
     @GetMapping("/pila")
-    public String transferirPila() throws JsonProcessingException, NoSuchPaddingException, NoSuchAlgorithmException, InvalidKeyException, IllegalBlockSizeException, BadPaddingException {
-        if (this.transferirPilaService.transferirPila()) {
+    public String transferirPila(@RequestBody TransacaoUsuario transacaoUsuario) throws JsonProcessingException, NoSuchPaddingException, NoSuchAlgorithmException, InvalidKeyException, IllegalBlockSizeException, BadPaddingException {
+
+        if (this.transferirPilaService.transferirPila(transacaoUsuario)) {
             return "***************** DEU BOM NA TRANSAÇÃO! *****************";
         }
         return "***************** USUARIO INDISPONIVEL OU NENHUM PILA DISPONIVEL PARA TRANSAÇÃO! *****************";

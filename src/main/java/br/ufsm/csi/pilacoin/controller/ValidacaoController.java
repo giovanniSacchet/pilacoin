@@ -21,9 +21,6 @@ public class ValidacaoController {
     }
     @GetMapping("/pila")
     public String validarPilacoin() {
-        this.mineracaoService.pararMineracaoPila();
-        this.mineracaoService.pararMineracaoBloco();
-        this.validacaoService.pararValidacaoBloco();
         this.validacaoService.iniciarValidacaoPila();
         return "*** INICIANDO VALIDAÇÃO DE PILACOIN ***";
     }
@@ -35,9 +32,6 @@ public class ValidacaoController {
 
     @GetMapping("/bloco")
     public String validarBloco() {
-        this.mineracaoService.pararMineracaoPila();
-        this.mineracaoService.pararMineracaoBloco();
-        this.validacaoService.pararValidacaoPila();
         this.validacaoService.iniciarValidacaoBloco();
         return "*** INICIANDO VALIDAÇÃO DE BLOCO ***";
     }

@@ -5,6 +5,7 @@ import br.ufsm.csi.pilacoin.repository.BlocoRepository;
 import br.ufsm.csi.pilacoin.repository.PilacoinRepository;
 import br.ufsm.csi.pilacoin.repository.TransferirPilaRepository;
 import br.ufsm.csi.pilacoin.repository.UsuarioRepository;
+import br.ufsm.csi.pilacoin.shared.KeyUtil;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.SneakyThrows;
@@ -143,8 +144,6 @@ public class ReportService {
                 } else { // Cadastra todos pilas no meu nome no banco
                     this.salvarPilaBanco(pila);
                 }
-
-
             }
         }
     }
@@ -200,6 +199,24 @@ public class ReportService {
         } else if (receberQueryServidor.getUsuariosResult() != null && !receberQueryServidor.getUsuariosResult().isEmpty()) {
             this.salvarUsuarioQuery(receberQueryServidor.getUsuariosResult());
         }
+    }
+
+    public int calculaSaldoPilacoin() {
+        List<Pilacoin> pilasValidados = pilacoinRepository.findAllByStatus("VALIDO");
+        List<Pilacoin> pilasDisponiveis = new ArrayList<>();
+        List<TransferirPila> transacoesPila;
+
+        for (Pilacoin pila : pilasValidados) {
+            transacoesPila = this.transferirPilaRepository.findAllByNoncePila(pila.getNonce());
+            if (!transacoesPila.isEmpty()) {
+                pila.setTransacoes(transacoesPila);
+            }
+            if (Arrays.equals(pila.getChaveCriador(), KeyUtil.publicKey.getEncoded()) && pila.getTransacoes() == null || pila.getTransacoes().size() <= 1) {
+                pilasDisponiveis.add(pila);
+            }
+        }
+
+        return pilasDisponiveis.size();
     }
 
 }

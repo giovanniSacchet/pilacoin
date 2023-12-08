@@ -23,24 +23,14 @@ public class MineracaoController {
     @GetMapping("/pila")
     public String minerarPilacoin() {
         String retorno = "*** INICIANDO MINERAÇÃO DE PILACOIN ***";
-
-        this.validacaoService.pararValidacaoPila();
-        this.validacaoService.pararValidacaoBloco();
-        this.mineracaoService.pararMineracaoBloco();
         this.mineracaoService.minerarPilacoin();
-
         return retorno;
     }
 
     @GetMapping("/bloco")
     public String minerarBloco() {
         String retorno = "*** INICIANDO MINERAÇÃO DE BLOCOS ***";
-
-        this.validacaoService.pararValidacaoPila();
-        this.validacaoService.pararValidacaoBloco();
-        this.mineracaoService.pararMineracaoPila();
         this.mineracaoService.iniciarMineracaoBloco();
-
         return retorno;
     }
 

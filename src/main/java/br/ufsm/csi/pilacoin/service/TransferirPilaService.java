@@ -1,6 +1,7 @@
 package br.ufsm.csi.pilacoin.service;
 
 import br.ufsm.csi.pilacoin.model.Pilacoin;
+import br.ufsm.csi.pilacoin.model.TransacaoUsuario;
 import br.ufsm.csi.pilacoin.model.TransferirPila;
 import br.ufsm.csi.pilacoin.model.Usuario;
 import br.ufsm.csi.pilacoin.repository.PilacoinRepository;
@@ -39,7 +40,7 @@ public class TransferirPilaService {
 
     }
 
-    public boolean transferirPila() throws JsonProcessingException, NoSuchPaddingException, NoSuchAlgorithmException, InvalidKeyException, IllegalBlockSizeException, BadPaddingException {
+    public boolean transferirPila(TransacaoUsuario transacaoUsuario) throws JsonProcessingException, NoSuchPaddingException, NoSuchAlgorithmException, InvalidKeyException, IllegalBlockSizeException, BadPaddingException {
         List<Pilacoin> pilasValidados = pilacoinRepository.findAllByStatus("VALIDO");
         List<Pilacoin> pilasDisponiveis = new ArrayList<>();
         List<TransferirPila> transacoesPila;
@@ -55,34 +56,35 @@ public class TransferirPilaService {
         }
 
         // ***** PEGA USUARIO QUALQUER ******
-        Optional<Usuario> usuario = this.usuarioRepository.findByNome("Casanova");
+        Optional<Usuario> usuario = this.usuarioRepository.findByNome(transacaoUsuario.getUsuario().getNome());
 
         if (usuario.isPresent() && !pilasDisponiveis.isEmpty()) {
 
-            TransferirPila transferencia = TransferirPila.builder().
-                    chaveUsuarioOrigem(KeyUtil.publicKey.getEncoded()).
-                    chaveUsuarioDestino(usuario.get().getChavePublica()).
-                    nomeUsuarioOrigem("gxs").
-                    nomeUsuarioDestino(usuario.get().getNome()).
-                    dataTransacao(new Date()).
-                    noncePila(pilasDisponiveis.get(0).getNonce()).
-                    build();
+            for (int i = 0; i < transacaoUsuario.getQuantidade(); i++) {
+                TransferirPila transferencia = TransferirPila.builder().
+                        chaveUsuarioOrigem(KeyUtil.publicKey.getEncoded()).
+                        chaveUsuarioDestino(usuario.get().getChavePublica()).
+                        nomeUsuarioOrigem("gxs").
+                        nomeUsuarioDestino(usuario.get().getNome()).
+                        dataTransacao(new Date()).
+                        noncePila(pilasDisponiveis.get(i).getNonce()).
+                        build();
+                ObjectMapper objectMapper = new ObjectMapper();
+                objectMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
+                String str = objectMapper.writeValueAsString(transferencia);
 
-            ObjectMapper objectMapper = new ObjectMapper();
-            objectMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
-            String str = objectMapper.writeValueAsString(transferencia);
+                Cipher cipher = Cipher.getInstance("RSA");
+                cipher.init(Cipher.ENCRYPT_MODE, KeyUtil.privateKey);
+                MessageDigest md = MessageDigest.getInstance("SHA-256");
+                byte[] assinatura = md.digest(str.getBytes(StandardCharsets.UTF_8));
 
-            Cipher cipher = Cipher.getInstance("RSA");
-            cipher.init(Cipher.ENCRYPT_MODE, KeyUtil.privateKey);
-            MessageDigest md = MessageDigest.getInstance("SHA-256");
-            byte[] assinatura = md.digest(str.getBytes(StandardCharsets.UTF_8));
+                transferencia.setAssinatura(cipher.doFinal(assinatura));
 
-            transferencia.setAssinatura(cipher.doFinal(assinatura));
+                //System.out.println(objectMapper.writeValueAsString(transferencia));
+                rabbitTemplate.convertAndSend("transferir-pila", objectMapper.writeValueAsString(transferencia));
 
-            //System.out.println(objectMapper.writeValueAsString(transferencia));
-            rabbitTemplate.convertAndSend("transferir-pila", objectMapper.writeValueAsString(transferencia));
-
-            this.transferirPilaRepository.save(transferencia);
+                this.transferirPilaRepository.save(transferencia);
+            }
             return true;
         }
         return false;

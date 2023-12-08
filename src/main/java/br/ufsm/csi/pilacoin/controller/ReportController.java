@@ -52,4 +52,9 @@ public class ReportController {
         rabbitTemplate.convertAndSend("query", objectMapper.writeValueAsString(EnviarQueryServidor.builder().
                 tipoQuery("USUARIOS").idQuery(39).nomeUsuario("gxs").build()));
     }
+
+    @GetMapping("/saldo")
+    public int getSaldoAtual()  {
+        return this.reportService.calculaSaldoPilacoin();
+    }
 }
