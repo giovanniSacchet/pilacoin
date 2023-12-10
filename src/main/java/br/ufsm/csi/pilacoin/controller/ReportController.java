@@ -1,12 +1,15 @@
 package br.ufsm.csi.pilacoin.controller;
 
 import br.ufsm.csi.pilacoin.model.EnviarQueryServidor;
+import br.ufsm.csi.pilacoin.model.Mensagem;
 import br.ufsm.csi.pilacoin.model.Report;
 import br.ufsm.csi.pilacoin.service.ReportService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/report")
@@ -51,6 +54,11 @@ public class ReportController {
         ObjectMapper objectMapper = new ObjectMapper();
         rabbitTemplate.convertAndSend("query", objectMapper.writeValueAsString(EnviarQueryServidor.builder().
                 tipoQuery("USUARIOS").idQuery(39).nomeUsuario("gxs").build()));
+    }
+
+    @GetMapping("/log")
+    public List<Mensagem> getMensagensServidor()  {
+        return this.reportService.getMensagensServidor();
     }
 
     @GetMapping("/saldo")

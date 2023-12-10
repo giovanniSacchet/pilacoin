@@ -1,10 +1,7 @@
 package br.ufsm.csi.pilacoin.service;
 
 import br.ufsm.csi.pilacoin.model.*;
-import br.ufsm.csi.pilacoin.repository.BlocoRepository;
-import br.ufsm.csi.pilacoin.repository.PilacoinRepository;
-import br.ufsm.csi.pilacoin.repository.TransferirPilaRepository;
-import br.ufsm.csi.pilacoin.repository.UsuarioRepository;
+import br.ufsm.csi.pilacoin.repository.*;
 import br.ufsm.csi.pilacoin.shared.KeyUtil;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -24,14 +21,17 @@ public class ReportService {
     private final BlocoRepository blocoRepository;
     private final TransferirPilaRepository transferirPilaRepository;
     private final UsuarioRepository usuarioRepository;
+    private final MensagemRepository mensagemRepository;
     public ReportService(PilacoinRepository pilacoinRepository,
                          BlocoRepository blocoRepository,
                          TransferirPilaRepository transferirPilaRepository,
-                         UsuarioRepository usuarioRepository) {
+                         UsuarioRepository usuarioRepository,
+                         MensagemRepository mensagemRepository) {
         this.pilacoinRepository = pilacoinRepository;
         this.blocoRepository = blocoRepository;
         this.transferirPilaRepository = transferirPilaRepository;
         this.usuarioRepository = usuarioRepository;
+        this.mensagemRepository = mensagemRepository;
     }
 
     @RabbitListener(queues = "report")
@@ -178,7 +178,21 @@ public class ReportService {
 
     @RabbitListener(queues = "gxs")
     public void ouvirMensagensServidor(@Payload String msg){
+        Mensagem mensagem = new Mensagem();
+        try {
+            ObjectMapper objectMapper = new ObjectMapper();
+            mensagem = objectMapper.readValue(msg, Mensagem.class);
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+        }
+        this.mensagemRepository.save(mensagem);
         System.out.println("\n\n*****************************************************\n\t" + msg + "\n*****************************************************\n\n");
+    }
+
+    public List<Mensagem> getMensagensServidor() {
+        List<Mensagem> mensagens = this.mensagemRepository.findAll();
+        this.mensagemRepository.deleteAll();
+        return mensagens;
     }
 
     @SneakyThrows

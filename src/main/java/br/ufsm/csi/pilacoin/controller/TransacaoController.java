@@ -21,7 +21,7 @@ public class TransacaoController {
         this.transferirPilaService = transferirPilaService;
     }
 
-    @GetMapping("/pila")
+    @PostMapping("/pila")
     public String transferirPila(@RequestBody TransacaoUsuario transacaoUsuario) throws JsonProcessingException, NoSuchPaddingException, NoSuchAlgorithmException, InvalidKeyException, IllegalBlockSizeException, BadPaddingException {
 
         if (this.transferirPilaService.transferirPila(transacaoUsuario)) {

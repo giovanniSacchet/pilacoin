@@ -72,11 +72,11 @@ public class ValidacaoService {
         } catch (Exception e) {
             //e.printStackTrace();
             rabbitTemplate.convertAndSend("bloco-minerado", blocoStr);
-            //System.out.println("\n\n***** BLOCO INVALIDO! *****");
+            System.out.println("\n\n***** BLOCO INVALIDO! *****");
             return;
         }
 
-        if (!validandoBloco || bloco.getNomeUsuarioMinerador().equals("gxs")) {
+        if (bloco.getNomeUsuarioMinerador() != null && (!validandoBloco || bloco.getNomeUsuarioMinerador().equals("gxs"))) {
             rabbitTemplate.convertAndSend("bloco-minerado", blocoStr);
             return;
         }

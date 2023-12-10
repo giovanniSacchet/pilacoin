@@ -78,7 +78,7 @@ public class MineracaoService {
         BigInteger hash;
         String blocoJson = "";
 
-        while(this.minerandoBloco){
+        while(this.minerandoBloco) {
             bloco.setNonceBlocoAnterior(bloco.getNonce());
             bloco.setNonce(getNonce());
 
