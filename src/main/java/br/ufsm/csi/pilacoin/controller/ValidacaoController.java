@@ -1,6 +1,5 @@
 package br.ufsm.csi.pilacoin.controller;
 
-import br.ufsm.csi.pilacoin.service.MineracaoService;
 import br.ufsm.csi.pilacoin.service.ValidacaoService;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -13,11 +12,9 @@ import org.springframework.web.bind.annotation.RestController;
 public class ValidacaoController {
 
     private final ValidacaoService validacaoService;
-    private final MineracaoService mineracaoService;
 
-    public ValidacaoController(ValidacaoService validacaoService, MineracaoService mineracaoService) {
+    public ValidacaoController(ValidacaoService validacaoService) {
         this.validacaoService = validacaoService;
-        this.mineracaoService = mineracaoService;
     }
     @GetMapping("/pila")
     public String validarPilacoin() {

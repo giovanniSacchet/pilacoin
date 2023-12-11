@@ -1,7 +1,6 @@
 package br.ufsm.csi.pilacoin.controller;
 
 import br.ufsm.csi.pilacoin.service.MineracaoService;
-import br.ufsm.csi.pilacoin.service.ValidacaoService;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -13,11 +12,9 @@ import org.springframework.web.bind.annotation.RestController;
 public class MineracaoController {
 
     private final MineracaoService mineracaoService;
-    private final ValidacaoService validacaoService;
 
-    public MineracaoController(MineracaoService mineracaoService, ValidacaoService validacaoService) {
+    public MineracaoController(MineracaoService mineracaoService) {
         this.mineracaoService = mineracaoService;
-        this.validacaoService = validacaoService;
     }
 
     @GetMapping("/pila")
@@ -31,18 +28,6 @@ public class MineracaoController {
     public String minerarBloco() {
         String retorno = "*** INICIANDO MINERAÇÃO DE BLOCOS ***";
         this.mineracaoService.iniciarMineracaoBloco();
-        return retorno;
-    }
-
-    @GetMapping("/tudo")
-    public String minerarTudo() {
-        String retorno = "*** INICIANDO MINERAÇÃO DE PILAS E BLOCOS ***";
-
-        this.validacaoService.pararValidacaoPila();
-        this.validacaoService.pararValidacaoBloco();
-        this.mineracaoService.iniciarMineracaoBloco();
-        this.mineracaoService.minerarPilacoin();
-
         return retorno;
     }
 

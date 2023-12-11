@@ -144,7 +144,15 @@ public class ReportService {
                 } else { // Cadastra todos pilas no meu nome no banco
                     this.salvarPilaBanco(pila);
                 }
+            } else if (pila.getTransacoes() != null && pila.getTransacoes().isEmpty()) {
+                List<TransferirPila> transacoesPila = pila.getTransacoes();
+                for (TransferirPila t : transacoesPila) {
+                    if (t.getChaveUsuarioDestino() == KeyUtil.publicKey.getEncoded()) {
+                        this.salvarPilaBanco(pila);
+                    }
+                }
             }
+
         }
     }
 
